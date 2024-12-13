@@ -1,0 +1,783 @@
+// HOSPITAL MANAGEMENT SYSTEM
+//  1. data :
+//       . people data
+//       . staff data
+//       . client data
+//       . number of operataion solve
+//       . number of operatio failled
+// 2 . HOSPITAL detail :
+//	        . place
+//	        . number of doctors
+//  	        . number of nurses
+// 3 . Ambulance datail :
+//	       . number of ambulance
+//	        . adding ambulance
+// 4. prices of operations :
+//	       . h1eart surfery price
+//	       . simple operation
+//	       . emergency operation
+//	       . simple brain operation
+// 5. datail of loperation fullfill / complete :
+//	       . ?????
+
+// 6. price of extra bad_rest in hospital :
+//	       . 1 Day = ??? price
+//	       . 2 Days = ??? price
+//	       . 1 Week = ????price
+// 7. mediien detail :
+//	      . all medicine incluee (yes / NO );
+//	       . rating in medicine buy in every year in hospital :
+//	       	. save medicine detail
+
+#include <iostream>
+#include <fstream>
+#include <string>
+using namespace std;
+
+class hospital;
+hospital *head = NULL;
+class hospitaldata;
+hospitaldata *hea = NULL;
+class medicine;
+medicine *he = NULL;
+
+class hospital
+{
+private:
+    string name_of_people;
+    int number[12];
+    string city;
+    int cnic_numbers;
+    string date_of_birth;
+
+    string staff_name;
+    int staff_number;
+    int staff_id;
+
+    string client_name;
+    int client_number;
+    int client_id;
+
+    int number_of_operations_solved;
+    int number_of_operations_failed;
+
+public:
+    hospital *next;
+
+    hospital()
+    {
+    }
+    hospital(string name, int num[], string ci, int cnic, string dob,
+             string staffn = "", int staffnum = 0, int staffi = 0,
+             string clientn = "", int clientnum = 0, int clientid = 0,
+             int numbersolved = 0, int numberfailed = 0)
+    {
+        name_of_people = name;
+        for (int i = 0; i < 12; i++)
+        {
+            number[i] = num[i];
+        }
+        city = ci;
+        cnic_numbers = cnic;
+        date_of_birth = dob;
+        staff_name = staffn;
+        staff_number = staffnum;
+        staff_id = staffi;
+        client_name = clientn;
+        client_number = clientnum;
+        client_id = clientid;
+        number_of_operations_solved = numbersolved;
+        number_of_operations_failed = numberfailed;
+        next = NULL;
+    }
+
+    void insert_at_start(string name, int num[], string ci, int cnic, string dob)
+    {
+        hospital *n = new hospital(name, num, ci, cnic, dob);
+        n->next = head;
+        head = n;
+        cout << "The details of the person added: " << name << endl;
+    }
+
+    void staffadd(string staffn, int staffnum, int staffi)
+    {
+        int tempNum[12] = {0};
+        hospital *n = new hospital("", tempNum, "", 0, "", staffn, staffnum, staffi);
+        if (head == NULL)
+        {
+            head = n;
+        }
+        else
+        {
+            hospital *temp = head;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = n;
+        }
+        cout << "Staff member added: " << staffn << endl;
+    }
+
+    void searchstaff(int staff_id)
+    {
+        hospital *temp = head;
+        while (temp != NULL)
+        {
+            if (temp->staff_id == staff_id)
+            {
+                cout << "Staff ID: " << temp->staff_id << ", Name: " << temp->staff_name
+                     << ", Staff Number: " << temp->staff_number << endl;
+                return;
+            }
+            temp = temp->next;
+        }
+        cout << "Staff not found!" << endl;
+    }
+
+    void clientdata(string clientn, int clientnum, int clientid)
+    {
+        int tempnum[12] = {0};
+        hospital *n = new hospital("", tempnum, "", 0, "", "", 0, 0, clientn, clientnum, clientid);
+        n->next = head;
+        head = n;
+        cout << "Client data added: " << clientn << endl;
+    }
+
+    void operationdata(int numbersolved, int numberfailed)
+    {
+        int solvedcount, failedcount;
+        hospital *temp = head;
+        while (temp != NULL)
+        {
+            solvedcount += numbersolved;
+            failedcount += numberfailed;
+            temp = temp->next;
+        }
+        cout << "Operations solved: " << solvedcount << endl;
+        cout << "Operations failed: " << failedcount << endl;
+    }
+
+    void save_at_file(const string &DSAPROJECTHA) const
+    {
+        ofstream outfile(DSAPROJECTHA, ios::app);
+        if (outfile.is_open())
+        {
+            hospital *temp = head;
+            while (temp != NULL)
+            {
+                outfile << "Name: " << temp->name_of_people << "\n";
+                outfile << "Phone Numbers: ";
+                for (int i = 0; i < 12; i++)
+                {
+                    outfile << temp->number[i] << " ";
+                }
+                outfile << endl;
+                outfile << "City: " << temp->city << endl;
+                outfile << "CNIC: " << temp->cnic_numbers << endl;
+                outfile << "Date of Birth: " << temp->date_of_birth << endl;
+                outfile << "Staff Name: " << temp->staff_name << endl;
+                outfile << "Staff Number: " << temp->staff_number << endl;
+                outfile << "Staff ID: " << temp->staff_id << endl;
+                outfile << "Client Name: " << temp->client_name << endl;
+                outfile << "Client Number: " << temp->client_number << endl;
+                outfile << "Client ID: " << temp->client_id << endl;
+                outfile << "Operations Solved: " << temp->number_of_operations_solved << endl;
+                outfile << "Operations Failed: " << temp->number_of_operations_failed << endl;
+                outfile << "-----------------------------" << endl;
+                temp = temp->next;
+            }
+            outfile.close();
+            cout << "Data saved to file: " << DSAPROJECTHA << endl;
+        }
+        else
+        {
+            cout << "Error opening file!" << endl;
+        }
+    }
+
+    void load_at_file(const string &DSAPROJECTHA)
+    {
+        ifstream infile(DSAPROJECTHA);
+        if (infile.is_open())
+        {
+            hospital *temp = head;
+            while (temp != NULL)
+            {
+                infile >> temp->name_of_people;
+                for (int i = 0; i < 12; i++)
+                {
+                    infile >> temp->number[i];
+                }
+                infile >> temp->city;
+                infile >> temp->cnic_numbers;
+                infile >> temp->date_of_birth;
+                infile >> temp->staff_name;
+                infile >> temp->staff_number;
+                infile >> temp->staff_id;
+                infile >> temp->client_name;
+                infile >> temp->client_number;
+                infile >> temp->client_id;
+                infile >> temp->number_of_operations_solved;
+                infile >> temp->number_of_operations_failed;
+
+                temp = temp->next;
+            }
+            infile.close();
+            cout << "Data saved to file: " << DSAPROJECTHA << endl;
+        }
+        else
+        {
+            cout << "Error opening file!" << endl;
+        }
+    }
+};
+
+class hospitaldata
+{
+private:
+    int number_of_doctors;
+    int number_of_nurses;
+    int number_of_staffbro;
+    string place_name;
+
+    int number_of_ambulance;
+    int add_ambulance;
+
+    int heart_surgery_price;
+    int simple_operation;
+    int emergency_operation;
+    int simple_brain_operation;
+
+    int one_day;
+    int two_days;
+    int one_week;
+
+public:
+    hospitaldata *next;
+    hospitaldata(int numberdoc = 0, int numbernur = 0, string place = "", int numberstaffbro = 0, int numberambulance = 0,
+                 int addambulance = 0, int heartprice = 0, int simpleprice = 0, int emergencyprice = 0, int brainprice = 0,
+                 int oneday = 0, int twoday = 0, int oneweek = 0)
+    {
+        place_name = place;
+        number_of_doctors = numberdoc;
+        number_of_nurses = numbernur;
+        number_of_staffbro = numberstaffbro;
+        number_of_ambulance = numberambulance;
+        add_ambulance = addambulance;
+
+        heart_surgery_price = heartprice;
+        simple_operation = simpleprice;
+        emergency_operation = emergencyprice;
+        simple_brain_operation = brainprice;
+
+        one_day = oneday;
+        two_days = twoday;
+        one_week = oneweek;
+        next = NULL;
+    }
+
+    void insert_of_start(int numberdoc, int numbernur, string place, int numberstaffbro)
+    {
+        hospitaldata *newn = new hospitaldata(numberdoc, numbernur, place, numberstaffbro);
+        newn->next = hea;
+        hea = newn;
+        cout << " THE numbers of doctor add in Hospital :" << endl;
+        cin >> number_of_doctors;
+        cout << "The doctors add in Hospital :" << number_of_doctors << endl;
+
+        cout << " THE numbers of Nurses add in Hospital :" << endl;
+        cin >> number_of_nurses;
+        cout << "The Nurses add in Hospital :" << number_of_doctors << endl;
+
+        cout << " THE numbers of Staff add in Hospital :" << endl;
+        cin >> number_of_staffbro;
+        cout << "The doctors add in Hospital :" << number_of_staffbro << endl;
+    }
+
+    void Ambulancedatil(int numberambulance, int addambulance)
+    {
+        hospitaldata *newnn = new hospitaldata(numberambulance, addambulance);
+        newnn->next = hea;
+        newnn = hea;
+        cout << " The number of ambulance :" << endl;
+        cin >> number_of_ambulance;
+    }
+    void add_ambulance_detail(int numambulanceha, int addambulance)
+    {
+        hospitaldata *newambulance = new hospitaldata(0, 0, " ", 0, numambulanceha, addambulance);
+        cout << "Add Ambulance in HOSPITAL service :" << endl;
+        cout << " The ambulance enter :" << endl;
+        cin >> numambulanceha;
+        cout << "The Number of Ambulance ADD = " << numambulanceha << endl;
+        cout << " Which Ambulance add in Hospital list : " << endl;
+        cin >> addambulance;
+        cout << " The ambulance add in hospital list :" << addambulance << endl;
+        cin >> add_ambulance;
+        if (hea == NULL)
+        {
+            newambulance = hea;
+        }
+        else
+        {
+            hospitaldata *temp = hea;
+            while (temp->next == NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = newambulance;
+        }
+    }
+
+    void price_operations(int heartprice, int simpleprice, int emergencyprice, int brainprice)
+    {
+        hospitaldata *newprice = new hospitaldata(0, 0, " ", 0, 0, 0, heartprice, simpleprice, emergencyprice, brainprice);
+
+        cout << "THE OPERATION INCLUDE IN HOSPITAL :" << endl;
+        hospitaldata *temp = hea;
+        cin >> heart_surgery_price;
+        cin >> simple_operation;
+        cin >> emergency_operation;
+        cin >> simple_brain_operation;
+        cout << "1. heart operation:" << temp->heart_surgery_price << endl;
+        cout << "2. simple operation:" << temp->simple_operation << endl;
+        cout << "3. emergency operation:" << temp->emergency_operation << endl;
+        cout << "4. brain operation:" << temp->simple_brain_operation << endl;
+        if (hea == NULL)
+        {
+            newprice = hea;
+            cout << " the LIST is empty :" << endl;
+        }
+        else
+        {
+            hospitaldata *temp = hea;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = newprice;
+        }
+        cout << " the operation list have susscfully :" << endl;
+    }
+
+    void extrabedrest(int oneday, int twoday, int oneweek)
+    {
+        hospitaldata *newbed = new hospitaldata(0, 0, " ", 0, 0, 0, 0, oneday, twoday, oneweek);
+        hospital *temp = head;
+        cout << " bedrest price ." << endl;
+        cin >> one_day;
+        cout << "The one_DAY price stay in hospital =" << one_day << endl;
+        cin >> two_days;
+        cout << "The two_DAY price stay in hospital =" << two_days << endl;
+
+        cin >> one_week;
+        cout << "The one_WEEK price stay in hospital =" << one_week << endl;
+
+        cout << " 1. one-Day = " << one_day << endl;
+        cout << "2. two- Day = " << two_days << endl;
+        cout << " 3. one-week =" << one_week << endl;
+    }
+
+    void save_of_file(const string &DSAPROJECTHA)
+    {
+        ofstream outfile(DSAPROJECTHA, ios::app);
+        if (outfile.is_open())
+        {
+            hospitaldata *temp = hea;
+            while (temp != NULL)
+            {
+                outfile << "Number of Doctors: " << temp->number_of_doctors << endl;
+                outfile << "Number of Nurses: " << temp->number_of_nurses << endl;
+                outfile << "Place Name: " << temp->place_name << endl;
+                outfile << " numbers of staff :" << temp->number_of_staffbro << endl;
+                outfile << "-----------------------------" << endl;
+                outfile << " number of ambulance in hospital :" << temp->number_of_ambulance << endl;
+                outfile << " add ambulance :" << temp->add_ambulance << endl;
+                outfile << " ----------------------------- " << endl;
+                outfile << " the heart operation price :" << temp->heart_surgery_price << endl;
+                outfile << " the simple operation price :" << temp->simple_operation << endl;
+                outfile << " the emergency operation :" << temp->emergency_operation << endl;
+                outfile << " the brain operation price :" << temp->simple_brain_operation << endl;
+                outfile << " ------------------------------ " << endl;
+                outfile << " The one- Day equal to :" << temp->one_day << endl;
+                outfile << "The two- Day equal to :" << temp->two_days << endl;
+                outfile << "The one -week equal to :" << temp->one_week << endl;
+                outfile << " ------------------------------- " << endl;
+
+                temp = temp->next;
+            }
+            outfile.close();
+            cout << " Hospital data written in this file: " << DSAPROJECTHA << endl;
+        }
+        else
+        {
+            cout << "Error opening file!" << endl;
+        }
+    }
+
+    void load_of_file(const string &DSAPROJECTHA)
+    {
+        ifstream infile(DSAPROJECTHA);
+        if (infile.is_open())
+        {
+            string line;
+            hospitaldata *temp = hea;
+
+            while (hea != NULL)
+            {
+                if (getline(infile, line))
+                {
+                    temp->number_of_doctors = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->number_of_nurses = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->place_name = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->number_of_staffbro = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->number_of_ambulance = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->add_ambulance = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->heart_surgery_price = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->simple_operation = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->emergency_operation = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->simple_brain_operation = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->one_day = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->two_days = stoi(line);
+                }
+                if (getline(infile, line))
+                {
+                    temp->one_week = stoi(line);
+                }
+                temp = temp->next;
+            }
+            infile.close();
+            cout << " Any Hospital data read in this file: " << DSAPROJECTHA << endl;
+        }
+        else
+        {
+            cout << "Error opening file!" << endl;
+        }
+    }
+};
+
+class medicine
+{
+
+public:
+    string name_of_medicine;
+    int expire_date;
+    int medicine_id;
+
+    int medicine_number;
+    medicine *next;
+    medicine(string medicinename, int expired, int medicineid, int medicinenum)
+    {
+        name_of_medicine = medicinename;
+        expire_date = expired;
+        medicine_id = medicineid;
+        medicine_number = medicinenum;
+        next = NULL;
+    }
+
+    void insert_medicine(string medicinename, int expired, int medicineid, int medicinenum)
+    {
+        medicine *newnodeh = new medicine(medicinename, expired, medicineid, medicinenum);
+        newnodeh->next = he;
+        he = newnodeh;
+        cout << " The medicine name show in Hospital management list :" << name_of_medicine << endl;
+    }
+    void add_medicine(string medicinename, int expired, int medicineid, int medicinenum)
+    {
+        medicine *nodeha = new medicine(medicinename, expired, medicineid, medicinenum);
+        if (he = NULL)
+        {
+            nodeha = he;
+        }
+        else
+        {
+            medicine *temp = he;
+            while (temp->next != NULL)
+            {
+                temp = temp->next;
+            }
+            temp->next = NULL;
+        }
+        cout << " EXpired data of medicine :" << endl;
+        cin >> expire_date;
+    }
+
+    void save_file(const string &DSAPOJECTHA)
+    {
+        ofstream outfile(DSAPOJECTHA, ios::app);
+        if (outfile.is_open())
+        {
+            medicine *temp = he;
+            outfile << " the name of medicine :" << temp->name_of_medicine << endl;
+            while (temp->next = NULL)
+            {
+                outfile << " the medicine  expire date :" << temp->expire_date << endl;
+                outfile << " the medicine ID number :" << temp->medicine_id << endl;
+                outfile << " ---------------------------- " << endl;
+                outfile << " The delete medicine :" << temp->medicine_number << endl;
+                temp = temp->next;
+            }
+            outfile.close();
+            cout << "The file is used to written the  medicine detail :" << DSAPOJECTHA << endl;
+        }
+        else
+        {
+            cout << " This file is not used for written :" << endl;
+        }
+    }
+
+    void load_file(const string &DSAPROJECTHA)
+    {
+        ifstream infile(DSAPROJECTHA);
+        if (infile.is_open())
+        {
+            medicine *temp = he;
+            while (temp->next = NULL)
+            {
+                infile >> temp->expire_date;
+                infile >> temp->medicine_id;
+                infile >> temp->medicine_number;
+
+                temp = temp->next;
+            }
+            infile.close();
+            cout << "The file is used to written the  medicine detail :" << DSAPROJECTHA << endl;
+        }
+        else
+        {
+            cout << " This file is not used for written :" << endl;
+        }
+    }
+};
+
+int main()
+{
+
+    string file_path = ("C:/Users/HP/Documents/hospital_project.txt");
+    int hos;
+    hospital *newnewok = new hospital();
+    hospitaldata *newhospital = new hospitaldata();
+    medicine *newnew = new medicine("plasmaside 2 ", 23, 89798, 12345);
+    cout << "------THE HOSPITAL MANAGEMENT SYSTEM -------" << endl;
+    cout << "1. Add staff new staff data :" << endl;
+    cout << "2. Search staff data :" << endl;
+    cout << "3. Client Data :" << endl;
+    cout << "4. Operations Data in hospital :" << endl;
+    cout << "5. Ambulance detail :" << endl;
+    cout << "6. OPerations price in Hospital :" << endl;
+    cout << "7. Extra Bed rest in Hospital :" << endl;
+    cout << "8. Add medicnine :" << endl;
+    cout << "10. Save  Data in file : " << endl;
+    cout << "11. Read Data in file :" << endl;
+    cout << "12. The Error show in file :" << endl;
+    cout << "----------------------------- " << endl;
+    cout << "Entering phases 1 :" << endl;
+    cin >> hos;
+
+    while (hos)
+    {
+        cout << "------THE HOSPITAL MANAGEMENT SYSTEM -------" << endl;
+        cout << " 1. Add staff new staff data :" << endl;
+        cout << " 2. Search staff data :" << endl;
+        cout << " 3. Client Data :" << endl;
+        cout << " 4. Operations Data in hospital :" << endl;
+        cout << " 5. Ambulance detail :" << endl;
+        cout << " 6. OPerations price in Hospital :" << endl;
+        cout << " 7. Extra Bed rest in Hospital :" << endl;
+        cout << " 8. Add medicnine :" << endl;
+        cout << "10. Save  Data in file : " << endl;
+        cout << "11. Read Data in file :" << endl;
+        cout << "12. The Error show in file :" << endl;
+        cout << "Enter the number :" << endl;
+        cin >> hos;
+
+        switch (hos)
+        {
+
+        case 1:
+        {
+            string staff_name;
+            int staff_number;
+            int staff_id;
+            cout << " Enter the staff Data :" << endl;
+            cout << " The staff name :" << endl;
+            cin >> staff_name;
+            cout << " The staff number Enter :" << endl;
+            cin >> staff_number;
+            cout << " The staff_ID :" << endl;
+            cin >> staff_id;
+            head->staffadd(staff_name, staff_number, staff_id);
+            break;
+        }
+        case 2:
+        {
+            int staff_id;
+
+            cout << " Enter the staff ID number and see detail about staff  :" << endl;
+            cout << " The staff ID  :" << endl;
+            cin >> staff_id;
+            head->searchstaff(staff_id);
+            break;
+        }
+        case 3:
+        {
+            string client_name;
+            int client_number;
+            int client_id;
+            cout << " The client Data stored in Hospital list :" << endl;
+            cout << " Enter the client name :" << endl;
+            cin >> client_name;
+            cout << " Enter the client number :" << endl;
+            cin >> client_number;
+            cout << " Enter the client ID :" << endl;
+            cin >> client_id;
+
+            head->clientdata(client_name, client_number, client_id);
+            break;
+        }
+        case 4:
+        {
+            int number_of_operations_solved;
+            int number_of_operations_failed;
+
+            cout << " OPERATION  DATA ( SOLVE & FAILED ) :" << endl;
+            cout << " operation solved :" << endl;
+            cin >> number_of_operations_solved;
+            cout << " Operation failed :" << endl;
+            cin >> number_of_operations_failed;
+            cout << " The operations solved =" << number_of_operations_solved << endl;
+            cout << " The operations failed =" << number_of_operations_failed << endl;
+
+            head->operationdata(number_of_operations_solved, number_of_operations_failed);
+            break;
+        }
+        case 5:
+        {
+
+            int number_of_ambulance;
+            int add_ambulance;
+            cout << " THE HOSPITAL AMBULANCE DETAILS :" << endl;
+            cout << " The number of ambulance :" << endl;
+            cin >> number_of_ambulance;
+            cout << " The add ambulance :" << endl;
+            cin >> add_ambulance;
+            hea->Ambulancedatil(number_of_ambulance, add_ambulance);
+            break;
+        }
+        case 6:
+        {
+            int heart_surgery_price;
+            int simple_operation;
+            int emergency_operation;
+            int simple_brain_operation;
+
+            cout << " THE PRICES OF OPERATIONS IN HOSPITAL :" << endl;
+            cout << " Enter the price of (heart operation ):" << endl;
+            cin >> heart_surgery_price;
+            cout << " Enter the (simple operation) :" << endl;
+            cin >> simple_operation;
+            cout << " Enter the (emergency operations) :" << endl;
+            cin >> emergency_operation;
+            cout << " Enter the (brain operation ):" << endl;
+            cin >> simple_brain_operation;
+            hea->price_operations(heart_surgery_price, simple_operation, emergency_operation, simple_brain_operation);
+
+            break;
+        }
+
+        case 7:
+        {
+            int one_day;
+            int two_days;
+            int one_week;
+            cout << "EXTRABED REST IN HOSPITAL :" << endl;
+            cout << " Enter the (One Day ) price :" << endl;
+            cin >> one_day;
+            cout << " Enter the (Two Days ) price :" << endl;
+            cin >> two_days;
+            cout << " Enter the (One Week ) price :" << endl;
+            cin >> one_week;
+            hea->extrabedrest(one_day, two_days, one_week);
+            break;
+        }
+        case 8:
+        {
+            string name_of_medicine;
+            int expire_date;
+            int medicine_id;
+            cout << " ENTER THE MEDICINE DETAIL IN HOSPITAL :" << endl;
+            cout << " The name of medicine  :" << endl;
+            cin >> name_of_medicine;
+            cout << " The expire date of medicine :" << endl;
+            cin >> expire_date;
+            cout << " The medicine id number :" << endl;
+            cin >> medicine_id;
+
+            he->insert_medicine(" plasmacode 2 ", 23, 98799, 19999);
+            break;
+        }
+
+        case 10:
+        {
+            cout << " SAFE DATE IN HOSPITAL LIST :" << endl;
+            head->save_at_file("hospital_project.txt");
+            hea->save_of_file("hospital_project.txt");
+            he->save_file("hospital_project.txt");
+
+            break;
+        }
+        case 11:
+        {
+            cout << " READ HOSPITAL DATA IN HOSPITAL LIST :" << endl;
+            head->load_at_file("hospital_project.txt");
+            hea->load_of_file("hospital_project.txt");
+            he->load_file("hospital_project.txt");
+
+            break;
+        }
+        case 12:
+        {
+            cout << " The Hospital is existing :" << endl;
+            return 0;
+        }
+        default:
+            cout << " In Hospital Management System ma error show ho raha ha :" << endl;
+        }
+        cout << "Enter the number :" << endl;
+        cin >> hos;
+    }
+    return 0;
+}
